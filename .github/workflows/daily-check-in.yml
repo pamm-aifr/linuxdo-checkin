@@ -21,6 +21,9 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium
 
+      - name: Random delay
+        run: sleep $((RANDOM % 3600))
+        
       - name: Execute script
         env:
           LINUXDO_USERNAME: ${{ secrets.LINUXDO_USERNAME }}
