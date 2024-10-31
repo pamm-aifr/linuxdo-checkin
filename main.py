@@ -18,6 +18,7 @@ class LinuxDoBrowser:
         self.browser = self.pw.chromium.launch(headless=True, timeout=30000)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
+        self.target_count = 1000  # 设置的目标量
         self.page.goto(HOME_URL)
 
     def login(self):
@@ -39,14 +40,16 @@ class LinuxDoBrowser:
             return True
 
     def click_topic(self):
+        # 首先滚动页面加载帖子
+        topics = self.scroll_down_until_loaded()
         for topic in self.page.query_selector_all("#list-area .title"):
             logger.info("Click topic: " + topic.get_attribute("href"))
             page = self.context.new_page()
             page.goto(HOME_URL + topic.get_attribute("href"))
-            time.sleep(3)
-            if random.random() < 0.02:  # 100 * 0.02 * 30 = 60
-                self.click_like(page)
-            time.sleep(3)
+            time.sleep(random.uniform(2, 5))
+            # if random.random() < 0.02:  # 100 * 0.02 * 30 = 60
+            #     self.click_like(page)
+            # time.sleep(3)
             page.close()
 
     def run(self):
@@ -55,6 +58,23 @@ class LinuxDoBrowser:
         self.click_topic()
         self.print_connect_info()
 
+    def scroll_down_until_loaded(self):
+        """滚动到页面底部，直到加载的帖子数量达到目标数量"""
+        loaded_count = 0
+        while loaded_count < self.target_count:
+            # 获取当前加载的帖子数量
+            loaded_topics = self.page.query_selector_all("#list-area .title")
+            loaded_count = len(loaded_topics)
+            
+            if loaded_count >= self.target_count:
+                break  # 达到目标数量，停止滚动
+
+            # 滚动到底部触发加载新内容
+            self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            time.sleep(random.uniform(2, 4))  # 随机等待时间
+
+        return loaded_topics[:self.target_count]  # 返回目标数量的帖子
+    
     def click_like(self, page):
         logger.info("Click like")
         page.locator(".discourse-reactions-reaction-button").first.click()
