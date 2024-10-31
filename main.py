@@ -6,8 +6,8 @@ from loguru import logger
 from playwright.sync_api import sync_playwright
 from tabulate import tabulate
 
-USERNAME = os.environ.get("USERNAME")
-PASSWORD = os.environ.get("PASSWORD")
+USERNAME = os.environ.get("LINUXDO_USERNAME")
+PASSWORD = os.environ.get("LINUXDO_PASSWORD")
 
 HOME_URL = "https://linux.do/"
 
