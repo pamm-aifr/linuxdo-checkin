@@ -18,7 +18,7 @@ class LinuxDoBrowser:
         self.browser = self.pw.chromium.launch(headless=True, timeout=30000)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
-        self.target_count = 1000  # 设置的目标量
+        self.target_count = 10  # 设置的目标量
         self.page.goto(HOME_URL)
 
     def login(self):
