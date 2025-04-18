@@ -56,6 +56,7 @@ class LinuxDoBrowser:
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
         self.page.goto(HOME_URL)
+        self.browsed_topic_count = 0
 
     def login(self):
         logger.info("开始登录")
