@@ -46,6 +46,7 @@ GOTIFY_TOKEN = os.environ.get("GOTIFY_TOKEN")  # 新增环境变量
 
 HOME_URL = "https://linux.do/"
 LOGIN_URL = "https://linux.do/login"
+TARGET_TOPIC_COUNT = 3000
 
 
 class LinuxDoBrowser:
@@ -75,12 +76,40 @@ class LinuxDoBrowser:
             logger.info("登录成功")
             return True
 
-    def click_topic(self):
-        topic_list = self.page.query_selector_all("#list-area .title")
-        logger.info(f"发现 {len(topic_list)} 个主题帖")
-        for topic in topic_list:
-            self.click_one_topic(topic.get_attribute("href"))
+    # def click_topic(self):
+    #     topic_list = self.page.query_selector_all("#list-area .title")
+    #     logger.info(f"发现 {len(topic_list)} 个主题帖")
+    #     for topic in topic_list:
+    #         self.click_one_topic(topic.get_attribute("href"))
 
+    def click_topic(self):
+        while self.browsed_topic_count < TARGET_TOPIC_COUNT:
+            topic_list = self.page.query_selector_all("#list-area .title")
+            topic_count = len(topic_list)
+            logger.info(f"发现 {topic_count} 个主题帖, 当前浏览了 {self.browsed_topic_count}/{TARGET_TOPIC_COUNT}")
+            if topic_count == 0:
+                logger.warning("未发现任何主题帖，刷新页面")
+                self.page.reload()
+                time.sleep(5) # 等待页面加载
+                continue
+
+            for topic in topic_list:
+                if self.browsed_topic_count >= TARGET_TOPIC_COUNT:
+                    logger.info(f"已达到目标主题数量 {TARGET_TOPIC_COUNT}, 停止浏览")
+                    break
+                self.click_one_topic(topic.get_attribute("href"))
+                self.browsed_topic_count += 1
+
+            if self.browsed_topic_count < TARGET_TOPIC_COUNT:
+                logger.info("当前页面主题不足, 向下滚动页面...")
+                self.scroll_down()
+                time.sleep(5) # 等待页面加载
+
+    def scroll_down(self):
+        """向下滚动页面加载更多主题"""
+        self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        logger.info("已滚动到页面底部")
+        
     @retry_decorator()
     def click_one_topic(self, topic_url):
         page = self.context.new_page()
