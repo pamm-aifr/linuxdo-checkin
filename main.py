@@ -94,6 +94,12 @@ class LinuxDoBrowser:
                 time.sleep(5) # 等待页面加载
                 continue
 
+            if topic_count < TARGET_TOPIC_COUNT:
+                logger.info("当前页面主题不足, 向下滚动页面...")
+                self.scroll_down()
+                time.sleep(5) # 等待页面加载
+                continue
+                
             for topic in topic_list:
                 if self.browsed_topic_count >= TARGET_TOPIC_COUNT:
                     logger.info(f"已达到目标主题数量 {TARGET_TOPIC_COUNT}, 停止浏览")
@@ -101,10 +107,6 @@ class LinuxDoBrowser:
                 self.click_one_topic(topic.get_attribute("href"))
                 self.browsed_topic_count += 1
 
-            if self.browsed_topic_count < TARGET_TOPIC_COUNT:
-                logger.info("当前页面主题不足, 向下滚动页面...")
-                self.scroll_down()
-                time.sleep(5) # 等待页面加载
 
     def scroll_down(self):
         """向下滚动页面加载更多主题"""
@@ -122,8 +124,8 @@ class LinuxDoBrowser:
 
     def browse_post(self, page):
         prev_url = None
-        # 开始自动滚动，最多滚动10次
-        for _ in range(10):
+        # 开始自动滚动，最多滚动2次
+        for _ in range(2):
             # 随机滚动一段距离
             scroll_distance = random.randint(550, 650)  # 随机滚动 550-650 像素
             logger.info(f"向下滚动 {scroll_distance} 像素...")
