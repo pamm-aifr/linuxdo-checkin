@@ -46,7 +46,7 @@ GOTIFY_TOKEN = os.environ.get("GOTIFY_TOKEN")  # 新增环境变量
 
 HOME_URL = "https://linux.do/"
 LOGIN_URL = "https://linux.do/login"
-TARGET_TOPIC_COUNT = 3000
+TARGET_TOPIC_COUNT = 30
 
 
 class LinuxDoBrowser:
@@ -91,7 +91,7 @@ class LinuxDoBrowser:
             if topic_count == 0:
                 logger.warning("未发现任何主题帖，刷新页面")
                 self.page.reload()
-                time.sleep(5) # 等待页面加载
+                time.sleep(2) # 等待页面加载
                 continue
 
             if topic_count < TARGET_TOPIC_COUNT:
